@@ -71,6 +71,80 @@ int main() {
 
     return 0;
 }
+// que 3 or
+#include <stdio.h>
+
+#define MAX_PROCESSES 10
+
+struct Process {
+    int pid;
+    int arrival_time;
+    int burst_time;
+    int remaining_time;
+    int waiting_time;
+    int turnaround_time;
+};
+
+void roundRobin(struct Process processes[], int n, int time_quantum) {
+    int remaining_processes = n;
+    int current_time = 0;
+    int index = 0;
+
+    while (remaining_processes > 0) {
+        if (processes[index].remaining_time > 0) {
+            if (processes[index].remaining_time <= time_quantum) {
+                current_time += processes[index].remaining_time;
+                processes[index].waiting_time = current_time - processes[index].arrival_time - processes[index].burst_time;
+                processes[index].turnaround_time = current_time - processes[index].arrival_time;
+                processes[index].remaining_time = 0;
+                printf("Process %d completed at time %d\n", processes[index].pid, current_time);
+                remaining_processes--;
+            } else {
+                current_time += time_quantum;
+                processes[index].remaining_time -= time_quantum;
+            }
+        }
+        index = (index + 1) % n;
+    }
+}
+
+int main() {
+    struct Process processes[MAX_PROCESSES];
+    int n, time_quantum;
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    printf("Enter time quantum: ");
+    scanf("%d", &time_quantum);
+
+    printf("Enter arrival time and burst time for each process:\n");
+    for (int i = 0; i < n; i++) {
+        processes[i].pid = i + 1;
+        printf("Process %d:\n", i + 1);
+        printf("Arrival time: ");
+        scanf("%d", &processes[i].arrival_time);
+        printf("Burst time: ");
+        scanf("%d", &processes[i].burst_time);
+        processes[i].remaining_time = processes[i].burst_time;
+    }
+
+    roundRobin(processes, n, time_quantum);
+
+    // Calculate average waiting time and turnaround time
+    float avg_waiting_time = 0, avg_turnaround_time = 0;
+    for (int i = 0; i < n; i++) {
+        avg_waiting_time += processes[i].waiting_time;
+        avg_turnaround_time += processes[i].turnaround_time;
+    }
+    avg_waiting_time /= n;
+    avg_turnaround_time /= n;
+
+    printf("\nAverage Waiting Time: %.2f\n", avg_waiting_time);
+    printf("Average Turnaround Time: %.2f\n", avg_turnaround_time);
+
+    return 0;
+}
 // que 7 
 
 #include <stdio.h>
